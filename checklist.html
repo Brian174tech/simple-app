@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#07100b">
+    <meta name="description" content="A practical secure design checklist to review before launch.">
+    <title>Launch Checklist — Secure Systems Field Guide</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="screen">
+      <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">⌘</span> SECURE SYSTEMS <span class="brand-muted">/ FIELD GUIDE</span></a>
+        <div class="system-state"><span class="pulse" aria-hidden="true"></span> SYSTEM ONLINE <span class="state-divider">|</span> PUBLIC EDITION</div>
+      </header>
+      <div class="layout">
+        <aside class="sidebar" aria-label="Main navigation">
+          <div class="nav-label">DIRECTORY</div>
+          <nav>
+            <a class="nav-link" href="index.html"><span>01</span> Overview</a>
+            <a class="nav-link" href="principles.html"><span>02</span> Core principles</a>
+            <a class="nav-link" href="threat-modeling.html"><span>03</span> Threat modeling</a>
+            <a class="nav-link active" aria-current="page" href="checklist.html"><span>04</span> Launch checklist</a>
+          </nav>
+          <div class="side-note"><div class="nav-label">FIELD NOTE 004</div><p>A checklist is a prompt for conversation, not proof that risk is gone.</p><span class="note-signature">— VERIFY, THEN TRUST</span></div>
+          <div class="sidebar-footer">DOCS v1.0.0<br>STATIC BUILD · NO TRACKING</div>
+        </aside>
+        <main id="main" class="content">
+          <div class="breadcrumb"><a href="index.html">GUIDES</a> <span>/</span> LAUNCH CHECKLIST</div>
+          <section class="page-heading">
+            <div class="eyebrow"><span class="eyebrow-line"></span> PRE-FLIGHT REVIEW</div>
+            <h1>Ship with<br><span class="glow">confidence.</span></h1>
+            <p class="hero-copy">Use these prompts to guide a team review before release. Not every item fits every system; document the reasoning and the remaining risks.</p>
+          </section>
+          <section class="checklist">
+            <div class="check-group">
+              <div class="check-group-heading"><span class="check-icon" aria-hidden="true">◈</span><h2>Access & identity</h2><span class="check-count">01—04</span></div>
+              <ul>
+                <li><span class="check-box" aria-hidden="true"></span><span>Every user and service has a distinct identity.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>Access follows least privilege and is reviewed regularly.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>Authorization is checked on every sensitive operation.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>Secrets are not stored in source code or exposed in logs.</span></li>
+              </ul>
+            </div>
+            <div class="check-group">
+              <div class="check-group-heading"><span class="check-icon" aria-hidden="true">⌁</span><h2>Data & input</h2><span class="check-count">05—08</span></div>
+              <ul>
+                <li><span class="check-box" aria-hidden="true"></span><span>Only necessary data is collected, retained, and shared.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>Inputs are validated at system boundaries.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>Sensitive data is protected in transit and at rest where appropriate.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>Errors do not reveal secrets or unnecessary internal details.</span></li>
+              </ul>
+            </div>
+            <div class="check-group">
+              <div class="check-group-heading"><span class="check-icon" aria-hidden="true">⌕</span><h2>Operations & response</h2><span class="check-count">09—12</span></div>
+              <ul>
+                <li><span class="check-box" aria-hidden="true"></span><span>Dependencies are known and have a maintenance plan.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>Security-relevant events can be investigated without logging sensitive values.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>Backups and recovery procedures have been tested.</span></li>
+                <li><span class="check-box" aria-hidden="true"></span><span>There is a clear owner and response path for reported issues.</span></li>
+              </ul>
+            </div>
+          </section>
+          <div class="closing-note"><span class="pulse" aria-hidden="true"></span><div><strong>REVIEW COMPLETE?</strong><br>Record open risks, assign owners, and revisit this list when the system changes.</div></div>
+          <div class="next-panel"><div><div class="eyebrow">BACK TO THE BEGINNING</div><h2>Security is an ongoing practice.</h2></div><a class="button button-small" href="index.html">RETURN TO OVERVIEW <span aria-hidden="true">→</span></a></div>
+          <footer class="page-footer"><span>KEEP THE SURFACE SMALL. KEEP THE SIGNAL CLEAR.</span><span>SECURE SYSTEMS FIELD GUIDE <span class="footer-dot">●</span></span></footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

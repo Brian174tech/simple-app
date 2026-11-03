@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#07100b">
+    <meta name="description" content="Foundational principles for designing secure systems.">
+    <title>Core Principles — Secure Systems Field Guide</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="screen">
+      <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">⌘</span> SECURE SYSTEMS <span class="brand-muted">/ FIELD GUIDE</span></a>
+        <div class="system-state"><span class="pulse" aria-hidden="true"></span> SYSTEM ONLINE <span class="state-divider">|</span> PUBLIC EDITION</div>
+      </header>
+      <div class="layout">
+        <aside class="sidebar" aria-label="Main navigation">
+          <div class="nav-label">DIRECTORY</div>
+          <nav>
+            <a class="nav-link" href="index.html"><span>01</span> Overview</a>
+            <a class="nav-link active" aria-current="page" href="principles.html"><span>02</span> Core principles</a>
+            <a class="nav-link" href="threat-modeling.html"><span>03</span> Threat modeling</a>
+            <a class="nav-link" href="checklist.html"><span>04</span> Launch checklist</a>
+          </nav>
+          <div class="side-note"><div class="nav-label">FIELD NOTE 002</div><p>Assume every layer can fail. Design so one failure does not become every failure.</p><span class="note-signature">— DEFENSE IN DEPTH</span></div>
+          <div class="sidebar-footer">DOCS v1.0.0<br>STATIC BUILD · NO TRACKING</div>
+        </aside>
+        <main id="main" class="content">
+          <div class="breadcrumb"><a href="index.html">GUIDES</a> <span>/</span> CORE PRINCIPLES</div>
+          <section class="page-heading">
+            <div class="eyebrow"><span class="eyebrow-line"></span> THE FOUNDATION</div>
+            <h1>Core <span class="glow">principles.</span></h1>
+            <p class="hero-copy">A small set of durable ideas can guide hundreds of implementation decisions. Use them as defaults, not as a substitute for context.</p>
+          </section>
+          <section class="principle-list" aria-label="Secure design principles">
+            <article class="principle">
+              <span class="principle-number">01</span><div><h2>Least privilege</h2><p>Give each identity the minimum permissions required, for only as long as needed. Separate duties and review access as responsibilities change.</p><div class="example"><strong>IN PRACTICE</strong> A reporting service can read its own data, but cannot change account settings or access unrelated records.</div></div><span class="principle-tag">LIMIT ACCESS</span>
+            </article>
+            <article class="principle">
+              <span class="principle-number">02</span><div><h2>Fail securely</h2><p>When a dependency, check, or service fails, the system should land in a safe state. Make denial the default when authorization cannot be verified.</p><div class="example"><strong>IN PRACTICE</strong> If an access-control service is unavailable, protected actions are paused rather than allowed through.</div></div><span class="principle-tag">SAFE DEFAULTS</span>
+            </article>
+            <article class="principle">
+              <span class="principle-number">03</span><div><h2>Defense in depth</h2><p>Use independent layers of protection. No single control is perfect; multiple controls make a failure harder to exploit and easier to contain.</p><div class="example"><strong>IN PRACTICE</strong> Combine authentication, authorization, input validation, and monitoring instead of relying on one perimeter.</div></div><span class="principle-tag">LAYER DEFENSE</span>
+            </article>
+            <article class="principle">
+              <span class="principle-number">04</span><div><h2>Minimize attack surface</h2><p>Every exposed endpoint, feature, permission, and dependency adds complexity. Remove what is not needed and keep what remains well maintained.</p><div class="example"><strong>IN PRACTICE</strong> Disable unused interfaces and remove demo accounts before a service is deployed.</div></div><span class="principle-tag">REDUCE EXPOSURE</span>
+            </article>
+            <article class="principle">
+              <span class="principle-number">05</span><div><h2>Keep it simple</h2><p>Simple security rules are easier to inspect, test, and get right. Prefer clear, consistent mechanisms over clever exceptions and duplicated checks.</p><div class="example"><strong>IN PRACTICE</strong> Use one well-understood authorization layer consistently across routes.</div></div><span class="principle-tag">CLARITY WINS</span>
+            </article>
+          </section>
+          <div class="next-panel"><div><div class="eyebrow">NEXT STEP</div><h2>Put the principles to work.</h2></div><a class="button button-small" href="threat-modeling.html">MODEL YOUR THREATS <span aria-hidden="true">→</span></a></div>
+          <footer class="page-footer"><span>KEEP THE SURFACE SMALL. KEEP THE SIGNAL CLEAR.</span><span>SECURE SYSTEMS FIELD GUIDE <span class="footer-dot">●</span></span></footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

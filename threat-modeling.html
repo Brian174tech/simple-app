@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#07100b">
+    <meta name="description" content="A practical, repeatable approach to threat modeling.">
+    <title>Threat Modeling — Secure Systems Field Guide</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="screen">
+      <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">⌘</span> SECURE SYSTEMS <span class="brand-muted">/ FIELD GUIDE</span></a>
+        <div class="system-state"><span class="pulse" aria-hidden="true"></span> SYSTEM ONLINE <span class="state-divider">|</span> PUBLIC EDITION</div>
+      </header>
+      <div class="layout">
+        <aside class="sidebar" aria-label="Main navigation">
+          <div class="nav-label">DIRECTORY</div>
+          <nav>
+            <a class="nav-link" href="index.html"><span>01</span> Overview</a>
+            <a class="nav-link" href="principles.html"><span>02</span> Core principles</a>
+            <a class="nav-link active" aria-current="page" href="threat-modeling.html"><span>03</span> Threat modeling</a>
+            <a class="nav-link" href="checklist.html"><span>04</span> Launch checklist</a>
+          </nav>
+          <div class="side-note"><div class="nav-label">FIELD NOTE 003</div><p>You cannot protect what you have not identified. Start with the system and the data.</p><span class="note-signature">— KNOW YOUR TERRAIN</span></div>
+          <div class="sidebar-footer">DOCS v1.0.0<br>STATIC BUILD · NO TRACKING</div>
+        </aside>
+        <main id="main" class="content">
+          <div class="breadcrumb"><a href="index.html">GUIDES</a> <span>/</span> THREAT MODELING</div>
+          <section class="page-heading">
+            <div class="eyebrow"><span class="eyebrow-line"></span> MAP THE TERRAIN</div>
+            <h1>Ask better<br><span class="glow">what-ifs.</span></h1>
+            <p class="hero-copy">Threat modeling is a structured conversation about what you are building, what could go wrong, and what you will do about it. Repeat it whenever the system changes.</p>
+          </section>
+          <section class="model-flow" aria-label="Four steps to threat modeling">
+            <article class="flow-step"><span class="step-index">STEP 01</span><h2>Define the system</h2><p>Draw the boundaries. Identify components, users, services, data stores, and the flows between them.</p><div class="step-prompt"><span>ASK //</span> What are we building?</div></article>
+            <article class="flow-step"><span class="step-index">STEP 02</span><h2>Find what matters</h2><p>List sensitive data and critical operations. Note where trust changes as information moves through the system.</p><div class="step-prompt"><span>ASK //</span> What needs protection?</div></article>
+            <article class="flow-step"><span class="step-index">STEP 03</span><h2>Imagine failure</h2><p>Consider who might misuse the system, what they could reach, and how mistakes or outages could affect people.</p><div class="step-prompt"><span>ASK //</span> What could go wrong?</div></article>
+            <article class="flow-step"><span class="step-index">STEP 04</span><h2>Choose defenses</h2><p>Rank risks by likelihood and impact. Assign practical mitigations, owners, and a point to review each decision.</p><div class="step-prompt"><span>ASK //</span> What will we do?</div></article>
+          </section>
+          <section class="callout">
+            <div class="callout-symbol" aria-hidden="true">!</div>
+            <div><div class="eyebrow">KEEP IT USEFUL</div><h2>A threat model is a living tool.</h2><p>Keep it lightweight and specific to your system. Update it when data flows, integrations, user roles, or assumptions change. Record accepted risks and who owns them.</p></div>
+          </section>
+          <div class="next-panel"><div><div class="eyebrow">READY TO SHIP?</div><h2>Check the basics before launch.</h2></div><a class="button button-small" href="checklist.html">OPEN CHECKLIST <span aria-hidden="true">→</span></a></div>
+          <footer class="page-footer"><span>KEEP THE SURFACE SMALL. KEEP THE SIGNAL CLEAR.</span><span>SECURE SYSTEMS FIELD GUIDE <span class="footer-dot">●</span></span></footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
