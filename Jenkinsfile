@@ -85,9 +85,7 @@ PY'''
 
         stage('Publish Build') {
             steps {
-                script {
-                    // Intentionally empty until publishing is configured.
-                }
+                echo 'Publishing is not configured; no files were published.'
             }
         }
     }
