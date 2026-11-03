@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#07100b">
+    <meta name="description" content="Practical applications and safety guidelines for using AI in a Jenkins pipeline.">
+    <title>AI in Jenkins Pipeline — Secure Systems Field Guide</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="screen">
+      <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">⌘</span> SECURE SYSTEMS <span class="brand-muted">/ FIELD GUIDE</span></a>
+        <div class="system-state"><span class="pulse" aria-hidden="true"></span> SYSTEM ONLINE <span class="state-divider">|</span> PUBLIC EDITION</div>
+      </header>
+      <div class="layout">
+        <aside class="sidebar" aria-label="Main navigation">
+          <div class="nav-label">DIRECTORY</div>
+          <nav>
+            <a class="nav-link" href="index.html"><span>01</span> Overview</a>
+            <a class="nav-link" href="principles.html"><span>02</span> Core principles</a>
+            <a class="nav-link" href="threat-modeling.html"><span>03</span> Threat modeling</a>
+            <a class="nav-link" href="checklist.html"><span>04</span> Launch checklist</a>
+            <a class="nav-link active" aria-current="page" href="ai-jenkins.html"><span>05</span> AI in Jenkins</a>
+          </nav>
+          <div class="side-note">
+            <div class="nav-label">FIELD NOTE 005</div>
+            <p>AI can surface signals faster. The pipeline and the team stay in control.</p>
+            <span class="note-signature">— ADVISE, THEN VERIFY</span>
+          </div>
+          <div class="sidebar-footer">DOCS v1.0.0<br>STATIC BUILD · NO TRACKING</div>
+        </aside>
+        <main id="main" class="content">
+          <div class="breadcrumb"><a href="index.html">GUIDES</a> <span>/</span> AI IN JENKINS</div>
+          <section class="page-heading">
+            <div class="eyebrow"><span class="eyebrow-line"></span> HUMAN-LED AUTOMATION</div>
+            <h1>AI in Jenkins<br><span class="glow">pipeline.</span></h1>
+            <p class="hero-copy">AI can help teams gain faster insight into builds, tests, and risks. Treat its output as advice for people and existing pipeline rules.</p>
+          </section>
+
+          <section class="ai-intro" aria-labelledby="ai-purpose-title">
+            <div class="ai-section-heading">
+              <div><div class="eyebrow">PURPOSE OF AI</div><h2 id="ai-purpose-title">More insight. No extra authority.</h2></div>
+              <span class="section-index">[ ASSIST MODE ]</span>
+            </div>
+            <div class="ai-purpose-grid">
+              <article class="ai-purpose"><span>01</span><h3>Triage</h3><p>Group findings and help distinguish urgent signals from noise.</p></article>
+              <article class="ai-purpose"><span>02</span><h3>Summarize</h3><p>Make build results and findings easier to understand and turn them into a report.</p></article>
+              <article class="ai-purpose"><span>03</span><h3>Review</h3><p>Provide another perspective on code changes, tests, and potential risks.</p></article>
+              <article class="ai-purpose"><span>04</span><h3>Recommend</h3><p>Suggest next steps and improvements, with explanations and relevant context.</p></article>
+            </div>
+          </section>
+
+          <section class="ai-workflows" aria-labelledby="ai-stages">
+            <div class="ai-section-heading">
+              <div><div class="eyebrow">POSSIBLE PIPELINE STAGES</div><h2 id="ai-stages">Where AI can help.</h2></div>
+              <span class="section-index">[ BUILD → FEEDBACK ]</span>
+            </div>
+            <div class="ai-workflow-list">
+              <article class="ai-workflow"><span class="workflow-mark">01</span><div><h3>Improvement suggestions</h3><p>Recommend ways to improve readability, maintainability, and secure coding practices.</p></div><span class="workflow-stage">CODE REVIEW</span></article>
+              <article class="ai-workflow"><span class="workflow-mark">02</span><div><h3>Failure analysis</h3><p>Examine errors and logs, summarize the likely cause, and point to relevant context.</p></div><span class="workflow-stage">AFTER BUILD / TEST</span></article>
+              <article class="ai-workflow"><span class="workflow-mark">03</span><div><h3>Code suggestions and repairs</h3><p>Propose a focused change based on an error. A developer reviews and approves the diff before it is applied or merged.</p></div><span class="workflow-stage">WITH APPROVAL</span></article>
+              <article class="ai-workflow"><span class="workflow-mark">04</span><div><h3>Predict failure risks</h3><p>Use historical signals to identify potential post-release issues early and help reduce their impact.</p></div><span class="workflow-stage">PRE-RELEASE</span></article>
+              <article class="ai-workflow"><span class="workflow-mark">05</span><div><h3>Prioritize and select tests</h3><p>Select relevant tests based on code changes. This can save time and cost; retain fixed regression tests where needed.</p></div><span class="workflow-stage">TEST SELECTION</span></article>
+              <article class="ai-workflow"><span class="workflow-mark">06</span><div><h3>Pipeline insights</h3><p>Summarize build times, queues, and recurring failures to reveal opportunities for improvement.</p></div><span class="workflow-stage">CONTINUOUS</span></article>
+              <article class="ai-workflow"><span class="workflow-mark">07</span><div><h3>Detect unusual behavior</h3><p>Flag unexpected pipeline changes, such as unusual duration, failure patterns, or resource usage.</p></div><span class="workflow-stage">MONITORING</span></article>
+              <article class="ai-workflow"><span class="workflow-mark">08</span><div><h3>Test suggestions</h3><p>Suggest additional tests based on changed code, previous failures, or gaps in coverage.</p></div><span class="workflow-stage">TEST DESIGN</span></article>
+              <article class="ai-workflow"><span class="workflow-mark">09</span><div><h3>Trigger an authorized penetration test</h3><p>An approved security test can run after staging, but only against explicitly defined, authorized targets and within the agreed scope.</p></div><span class="workflow-stage">AFTER STAGING</span></article>
+            </div>
+          </section>
+
+          <section class="ai-rule" aria-label="Key principle">
+            <div class="callout-symbol" aria-hidden="true">!</div>
+            <div><div class="eyebrow">GUIDING PRINCIPLE</div><h2>AI advises; the pipeline decides.</h2><p>Let existing, auditable pipeline rules determine whether a build passes, is blocked, or is published. AI output is a recommendation, not an independent release decision.</p></div>
+          </section>
+
+          <section class="ai-guardrails" aria-labelledby="guardrails-title">
+            <div class="eyebrow">SAFEGUARDS</div>
+            <h2 id="guardrails-title">Keep boundaries explicit.</h2>
+            <ul class="guardrail-list">
+              <li>Do not send secrets or unnecessary personal data to AI services; minimize and redact logs.</li>
+              <li>Treat generated analyses and code as unverified suggestions.</li>
+              <li>Require human review and explicit approval for code changes and exceptions.</li>
+              <li>Limit security tests to pre-approved environments, targets, and test windows.</li>
+              <li>Log recommendations and decisions so it is clear what the pipeline itself determined.</li>
+            </ul>
+          </section>
+
+          <section class="source-panel" aria-labelledby="sources-title">
+            <div class="eyebrow">FURTHER READING</div>
+            <h2 id="sources-title">Sources</h2>
+            <ul class="source-list">
+              <li><a href="https://northflank.com/blog/top-ai-tools-cicd-pipeline-automation" target="_blank" rel="noopener noreferrer">Northflank — Top AI tools for CI/CD pipeline automation <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://medium.com/@er.roshan.linux/ai-for-ci-cd-make-your-pipelines-smarter-faster-and-self-healing-36b99fab35bb" target="_blank" rel="noopener noreferrer">Medium — AI for CI/CD: smarter, faster and self-healing pipelines <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://kodekloud.com/blog/using-ai-to-optimize-cicd-pipelines/" target="_blank" rel="noopener noreferrer">KodeKloud — Using AI to optimize CI/CD pipelines <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://www.monterail.com/blog/ai-adoption-in-devops-and-ci-cd#how-ai-transforms-each-stage-of-the-cicd-pipeline" target="_blank" rel="noopener noreferrer">Monterail — AI adoption in DevOps and CI/CD <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://barrion.io/penetration-testing/ci-cd" target="_blank" rel="noopener noreferrer">Barrion — Penetration testing in CI/CD <span aria-hidden="true">↗</span></a></li>
+            </ul>
+          </section>
+          <footer class="page-footer"><span>KEEP THE SURFACE SMALL. KEEP THE SIGNAL CLEAR.</span><span>SECURE SYSTEMS FIELD GUIDE <span class="footer-dot">●</span></span></footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

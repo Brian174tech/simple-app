@@ -185,6 +185,32 @@ h1::after { display: inline-block; margin-left: .13em; color: var(--green); cont
 .closing-note .pulse { margin-top: 5px; }
 .closing-note strong { color: var(--green); font-family: var(--mono); font-size: 9px; letter-spacing: .06em; }
 
+.ai-intro, .ai-workflows { margin-top: 28px; }
+.ai-section-heading { display: flex; justify-content: space-between; align-items: end; gap: 18px; margin-bottom: 15px; }
+.ai-section-heading h2, .ai-guardrails h2, .source-panel h2 { margin: 8px 0 0; font-size: clamp(20px, 3vw, 26px); font-weight: 500; letter-spacing: -.04em; }
+.ai-purpose-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.ai-purpose { min-height: 148px; padding: 14px; border: 1px dashed var(--line); background: linear-gradient(145deg, #0d160a, #080d08); }
+.ai-purpose > span { color: var(--green-dim); font-family: var(--mono); font-size: 9px; }
+.ai-purpose h3 { margin: 17px 0 7px; font-size: 15px; font-weight: 500; }
+.ai-purpose p, .ai-workflow p { margin: 0; color: #9eac8a; font-size: 11px; line-height: 1.7; }
+.ai-workflow-list { border-top: 1px dashed var(--line); }
+.ai-workflow { display: grid; grid-template-columns: 35px minmax(0, 1fr) auto; align-items: start; gap: 13px; padding: 16px 3px; border-bottom: 1px dashed var(--line); }
+.workflow-mark { color: var(--green); font-family: var(--mono); font-size: 10px; }
+.ai-workflow h3 { margin: -3px 0 5px; font-size: 14px; font-weight: 500; }
+.workflow-stage { align-self: start; padding: 5px 7px; border: 1px solid #354c27; color: var(--green-dim); font-family: var(--mono); font-size: 8px; letter-spacing: .04em; white-space: nowrap; }
+.ai-rule { display: flex; gap: 16px; margin-top: 25px; padding: 20px; border: 1px solid #537335; background: linear-gradient(130deg, rgb(43 65 25 / 48%), rgb(10 17 8 / 92%)); box-shadow: 0 0 22px rgb(147 190 73 / 8%), inset 0 0 20px rgb(0 0 0 / 28%); }
+.ai-rule h2 { margin: 8px 0; color: var(--green); font-size: clamp(19px, 3vw, 25px); font-weight: 600; text-shadow: 0 0 12px rgb(180 255 114 / 24%); }
+.ai-rule p { max-width: 700px; margin: 0; color: #b0bd9b; font-size: 12px; line-height: 1.75; }
+.ai-guardrails, .source-panel { margin-top: 28px; padding-top: 22px; border-top: 1px dashed var(--line); }
+.guardrail-list, .source-list { display: grid; gap: 8px; margin: 15px 0 0; padding: 0; list-style: none; }
+.guardrail-list li { position: relative; padding-left: 19px; color: #a7b394; font-size: 12px; line-height: 1.7; }
+.guardrail-list li::before { position: absolute; left: 0; color: var(--green); content: ">"; font-family: var(--mono); }
+.source-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
+.source-list li { padding: 10px 0; border-bottom: 1px dashed rgb(38 53 29 / 70%); }
+.source-list a { display: flex; justify-content: space-between; gap: 10px; color: #a7b394; font-size: 11px; line-height: 1.6; }
+.source-list a:hover { color: var(--green); }
+.source-list a span { flex: 0 0 auto; color: var(--green-dim); }
+
 @keyframes cursor-blink { 50% { opacity: 0; } }
 @keyframes led-blink { 50% { opacity: .55; } }
 
@@ -214,6 +240,8 @@ h1::after { display: inline-block; margin-left: .13em; color: var(--green); cont
   .card-icon { margin-top: 15px; }
   .principle { grid-template-columns: 32px minmax(0, 1fr); gap: 10px; }
   .principle-tag { grid-column: 2; justify-self: start; }
+  .ai-purpose-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .source-list { grid-template-columns: 1fr; }
   .page-footer { flex-direction: column; }
 }
 
@@ -224,8 +252,12 @@ h1::after { display: inline-block; margin-left: .13em; color: var(--green); cont
   h1 { font-size: clamp(40px, 12vw, 58px); }
   .hero-copy { font-size: 13px; }
   .model-flow, .checklist { grid-template-columns: 1fr; }
+  .ai-purpose-grid { grid-template-columns: 1fr; }
   .flow-step { min-height: 0; }
   .flow-step p { min-height: 0; }
+  .ai-workflow { grid-template-columns: 28px minmax(0, 1fr); }
+  .workflow-stage { grid-column: 2; justify-self: start; }
+  .ai-section-heading { align-items: flex-start; flex-direction: column; }
   .next-panel { align-items: flex-start; flex-direction: column; }
   .hero-meta { gap: 12px; font-size: 8px; }
   .section-index { display: none; }
