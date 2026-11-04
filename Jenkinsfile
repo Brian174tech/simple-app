@@ -40,7 +40,7 @@ for page in $pages; do
     }
 
     for target in $pages; do
-        grep -F "href=\"$target\"" "dist/$page" >/dev/null || {
+        grep -F -e "href=\"$target\"" -e "href='$target'" -e "href=$target" "dist/$page" >/dev/null || {
             echo "Build failed: $page does not link to $target." >&2
             exit 1
         }
