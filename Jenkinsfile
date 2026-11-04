@@ -40,7 +40,7 @@ for page in $pages; do
     }
 
     for target in $pages; do
-        awk -v target="$target" 'index($0, "href=\"" target "\"") || index($0, "href=\047" target "\047") || index($0, "href=" target) { found = 1 } END { exit !found }' "dist/$page" || {
+        grep -F 'href="'$target'"' "dist/$page" >/dev/null || {
             echo "Build failed: $page does not link to $target." >&2
             exit 1
         }
