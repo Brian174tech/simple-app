@@ -90,7 +90,6 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                     withCredentials([string(credentialsId: 'nova-api-key', variable: 'NOVA_API_KEY')]) {
                         sh '''
                             set -eu
-                            trap 'rm -f .ai-response.json' EXIT
                             printf 'header = "Authorization: Bearer %s"\\n' "$NOVA_API_KEY" |
                                 curl --config - --fail --silent --show-error --max-time 30 \\
                                     --header 'Content-Type: application/json' \\
