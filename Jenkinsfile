@@ -69,14 +69,14 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         job: env.JOB_NAME,
                         number: env.BUILD_NUMBER,
                         result: currentBuild.currentResult,
-                        durationSeconds: (currentBuild.duration / 1000).toLong()
+                        durationMilliseconds: currentBuild.duration
                     ]
                     def requestBody = JsonOutput.toJson([
                         model: 'qwen3.8:27b',
                         messages: [
                             [
                                 role: 'system',
-                                content: 'Schrijf een korte Nederlandse samenvatting van de Jenkins-build. Benoem de status en doorlooptijd. Geef alleen advies; bepaal niet of de build mag slagen of publiceren.'
+                                content: 'Schrijf een korte Nederlandse samenvatting van de Jenkins-build. Benoem de status en doorlooptijd; de opgegeven duur is in milliseconden. Geef alleen advies; bepaal niet of de build mag slagen of publiceren.'
                             ],
                             [
                                 role: 'user',
