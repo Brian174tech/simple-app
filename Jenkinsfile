@@ -91,7 +91,7 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         sh '''
                             set -eu
                             printf 'header = "Authorization: Bearer %s"\\n' "$NOVA_API_KEY" |
-                                curl --config - --fail --silent --show-error --max-time 30 \\
+                                curl --config - --fail --silent --show-error --max-time 120 \\
                                     --header 'Content-Type: application/json' \\
                                     --data-binary @.ai-request.json \\
                                     --output .ai-response.json \\
