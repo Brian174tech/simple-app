@@ -109,6 +109,8 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                     echo "AI pipeline summary (advisory): ${summary.trim().replaceAll(/[\\p{Cntrl}]+/, ' ').take(1000)}"
                 } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException interrupted) {
                     throw interrupted
+                } catch (org.jenkinsci.plugins.scriptsecurity.sandbox.RejectedAccessException rejected) {
+                    echo "WARNING: Jenkins Script Security blocked an operation: ${rejected.message}. Have an administrator review the signature under Manage Jenkins > In-process Script Approval."
                 } catch (Exception err) {
                     echo "WARNING: AI pipeline summary unavailable (${err.class.simpleName}); the Jenkins build result was not changed."
                 } finally {
