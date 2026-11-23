@@ -71,6 +71,12 @@
             </div>
           </section>
 
+          <section class="ai-guardrails" aria-labelledby="ai-example-title">
+            <div class="eyebrow">IMPLEMENTED EXAMPLE</div>
+            <h2 id="ai-example-title">Advisory pipeline summary.</h2>
+            <p>The Jenkinsfile requests a short summary of the job name, build number, result, and duration. It does not send source code or build logs. Configure a Jenkins Secret Text credential with the ID <code>nova-api-key</code> before running it. The summary is informational: an unavailable AI service is logged as a warning and does not change the build result.</p>
+          </section>
+
           <section class="ai-rule" aria-label="Key principle">
             <div class="callout-symbol" aria-hidden="true">!</div>
             <div><div class="eyebrow">GUIDING PRINCIPLE</div><h2>AI advises; the pipeline decides.</h2><p>Let existing, auditable pipeline rules determine whether a build passes, is blocked, or is published. AI output is a recommendation, not an independent release decision.</p></div>

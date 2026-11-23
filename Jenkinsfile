@@ -1,3 +1,6 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurperClassic
+
 pipeline {
     agent any
 
@@ -54,6 +57,63 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
         stage('Publish Build') {
             steps {
                 echo 'Publishing is not configured; no files were published.'
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                try {
+                    def buildContext = [
+                        job: env.JOB_NAME,
+                        number: env.BUILD_NUMBER,
+                        result: currentBuild.currentResult,
+                        durationSeconds: (currentBuild.duration / 1000).toLong()
+                    ]
+                    def requestBody = JsonOutput.toJson([
+                        model: 'qwen3.8:27b',
+                        messages: [
+                            [
+                                role: 'system',
+                                content: 'Schrijf een korte Nederlandse samenvatting van de Jenkins-build. Benoem de status en doorlooptijd. Geef alleen advies; bepaal niet of de build mag slagen of publiceren.'
+                            ],
+                            [
+                                role: 'user',
+                                content: "Pipelinegegevens: ${JsonOutput.toJson(buildContext)}"
+                            ]
+                        ],
+                        max_tokens: 256
+                    ])
+                    writeFile file: '.ai-request.json', text: requestBody
+
+                    withCredentials([string(credentialsId: 'nova-api-key', variable: 'NOVA_API_KEY')]) {
+                        sh '''
+                            set -eu
+                            trap 'rm -f .ai-response.json' EXIT
+                            printf 'header = "Authorization: Bearer %s"\\n' "$NOVA_API_KEY" |
+                                curl --config - --fail --silent --show-error --max-time 30 \\
+                                    --header 'Content-Type: application/json' \\
+                                    --data-binary @.ai-request.json \\
+                                    --output .ai-response.json \\
+                                    https://api.nova.datalabrotterdam.nl/v1/chat/completions
+                        '''
+                    }
+
+                    def response = new JsonSlurperClassic().parseText(readFile(file: '.ai-response.json'))
+                    def summary = response.choices?.getAt(0)?.message?.content
+                    if (!(summary instanceof String) || summary.trim().isEmpty()) {
+                        throw new IllegalStateException('AI service returned no summary text.')
+                    }
+
+                    echo "AI pipeline summary (advisory): ${summary.trim().replaceAll(/[\\p{Cntrl}]+/, ' ').take(1000)}"
+                } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException interrupted) {
+                    throw interrupted
+                } catch (Exception err) {
+                    echo "WARNING: AI pipeline summary unavailable (${err.class.simpleName}); the Jenkins build result was not changed."
+                } finally {
+                    sh 'rm -f .ai-request.json .ai-response.json'
+                }
             }
         }
     }
