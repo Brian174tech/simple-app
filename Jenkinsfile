@@ -78,38 +78,47 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         result: currentBuild.currentResult,
                         durationMilliseconds: currentBuild.duration
                     ]
-                    def requestBody = JsonOutput.toJson([
-                        model: 'qwen3.8:27b',
-                        messages: [
-                            [
-                                role: 'system',
-                                content: 'Schrijf een korte Nederlandse samenvatting van de Jenkins-build. Benoem de status en doorlooptijd; de opgegeven duur is in milliseconden. Geef alleen advies; bepaal niet of de build mag slagen of publiceren.'
-                            ],
-                            [
-                                role: 'user',
-                                content: "Pipelinegegevens: ${JsonOutput.toJson(buildContext)}"
-                            ]
+                    def messages = [
+                        [
+                            role: 'system',
+                            content: 'Schrijf een korte Nederlandse samenvatting van de Jenkins-build. Benoem de status en doorlooptijd; de opgegeven duur is in milliseconden. Geef alleen advies; bepaal niet of de build mag slagen of publiceren.'
                         ],
-                        max_tokens: 256
-                    ])
-                    writeFile file: '.ai-request.json', text: requestBody
+                        [
+                            role: 'user',
+                            content: "Pipelinegegevens: ${JsonOutput.toJson(buildContext)}"
+                        ]
+                    ]
+                    def summary = ''
+                    for (def maxTokens in [512, 1024]) {
+                        def requestBody = JsonOutput.toJson([
+                            model: 'qwen3.8:27b',
+                            messages: messages,
+                            max_tokens: maxTokens
+                        ])
+                        writeFile file: '.ai-request.json', text: requestBody
 
-                    withCredentials([string(credentialsId: 'nova-api-key', variable: 'NOVA_API_KEY')]) {
-                        sh '''
-                            set -eu
-                            printf 'header = "Authorization: Bearer %s"\\n' "$NOVA_API_KEY" |
-                                curl --config - --fail --silent --show-error --max-time 120 \\
-                                    --header 'Content-Type: application/json' \\
-                                    --data-binary @.ai-request.json \\
-                                    --output .ai-response.json \\
-                                    https://api.nova.datalabrotterdam.nl/v1/chat/completions
-                        '''
+                        echo "Waiting for AI summary (attempt ${maxTokens == 512 ? 1 : 2}/2; timeout 5 minutes)."
+                        withCredentials([string(credentialsId: 'nova-api-key', variable: 'NOVA_API_KEY')]) {
+                            sh '''
+                                set -eu
+                                printf 'header = "Authorization: Bearer %s"\\n' "$NOVA_API_KEY" |
+                                    curl --config - --fail --silent --show-error --max-time 300 \\
+                                        --header 'Content-Type: application/json' \\
+                                        --data-binary @.ai-request.json \\
+                                        --output .ai-response.json \\
+                                        https://api.nova.datalabrotterdam.nl/v1/chat/completions
+                            '''
+                        }
+
+                        def responseJson = readFile(file: '.ai-response.json')
+                        summary = parseAiSummary(responseJson)
+                        if (!summary.isEmpty()) {
+                            break
+                        }
                     }
 
-                    def responseJson = readFile(file: '.ai-response.json')
-                    def summary = parseAiSummary(responseJson)
                     if (summary.isEmpty()) {
-                        throw new IllegalStateException('AI service returned no summary text.')
+                        throw new IllegalStateException('AI service returned no summary text after retrying.')
                     }
 
                     writeFile file: 'ai-summary.txt', text: "${summary.take(5000)}\n"
