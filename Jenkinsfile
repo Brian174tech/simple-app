@@ -99,7 +99,7 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         '''
                     }
 
-                    def response = new JsonSlurperClassic().parseText(readFile(file: '.ai-response.json'))
+                    def response = readJSON file: '.ai-response.json', returnPojo: true
                     def summary = response.choices?.getAt(0)?.message?.content
                     if (!(summary instanceof String) || summary.trim().isEmpty()) {
                         throw new IllegalStateException('AI service returned no summary text.')
