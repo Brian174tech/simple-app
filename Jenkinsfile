@@ -1,6 +1,13 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurperClassic
 
+@NonCPS
+String parseAiSummary(String responseJson) {
+    def response = new JsonSlurperClassic().parseText(responseJson)
+    def summary = response.choices?.getAt(0)?.message?.content
+    return summary instanceof String ? summary.trim() : ''
+}
+
 pipeline {
     agent any
 
@@ -99,13 +106,13 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         '''
                     }
 
-                    def response = readJSON file: '.ai-response.json', returnPojo: true
-                    def summary = response.choices?.getAt(0)?.message?.content
-                    if (!(summary instanceof String) || summary.trim().isEmpty()) {
+                    def responseJson = readFile(file: '.ai-response.json')
+                    def summary = parseAiSummary(responseJson)
+                    if (summary.isEmpty()) {
                         throw new IllegalStateException('AI service returned no summary text.')
                     }
 
-                    writeFile file: 'ai-summary.txt', text: "${summary.trim().take(5000)}\n"
+                    writeFile file: 'ai-summary.txt', text: "${summary.take(5000)}\n"
                     archiveArtifacts artifacts: 'ai-summary.txt'
                 } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException interrupted) {
                     throw interrupted
