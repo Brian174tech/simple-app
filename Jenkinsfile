@@ -105,7 +105,8 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         throw new IllegalStateException('AI service returned no summary text.')
                     }
 
-                    echo "AI pipeline summary (advisory): ${summary.trim().replaceAll(/[\\p{Cntrl}]+/, ' ').take(1000)}"
+                    writeFile file: 'ai-summary.txt', text: "${summary.trim().take(5000)}\n"
+                    archiveArtifacts artifacts: 'ai-summary.txt'
                 } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException interrupted) {
                     throw interrupted
                 } catch (org.jenkinsci.plugins.scriptsecurity.sandbox.RejectedAccessException rejected) {
