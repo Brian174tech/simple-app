@@ -116,7 +116,7 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                     def messages = [
                         [
                             role: 'system',
-                            content: 'Schrijf een nuttig Nederlandstalig rapport over de Jenkins-build. Benoem de buildstatus en doorlooptijd. Vat de uitgevoerde controles samen, noem hoeveel er slaagden en faalden, en benoem mislukte controles expliciet. Als controles niet zijn uitgevoerd of resultaten ontbreken, zeg dat duidelijk. Gebruik alleen de aangeleverde feiten, verzin geen oorzaken of resultaten en geef hooguit concrete vervolgstappen als advies. De duur is in milliseconden. AI-output bepaalt niet of de build slaagt of gepubliceerd wordt.'
+                            content: 'Schrijf een nuttig Nederlandstalig rapport van maximaal 250 woorden over de Jenkins-build. Benoem de buildstatus en doorlooptijd. Vat de uitgevoerde controles samen, noem hoeveel er slaagden en faalden, en benoem mislukte controles expliciet. Als controles niet zijn uitgevoerd of resultaten ontbreken, zeg dat duidelijk. Gebruik alleen de aangeleverde feiten, verzin geen oorzaken of resultaten en geef hooguit concrete vervolgstappen als advies. De duur is in milliseconden. AI-output bepaalt niet of de build slaagt of gepubliceerd wordt.'
                         ],
                         [
                             role: 'user',
@@ -124,7 +124,7 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         ]
                     ]
                     def summary = ''
-                    for (def maxTokens in [1024, 2048]) {
+                    for (def maxTokens in [4096, 8192]) {
                         def requestBody = JsonOutput.toJson([
                             model: 'qwen3.8:27b',
                             messages: messages,
@@ -132,7 +132,7 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         ])
                         writeFile file: '.ai-request.json', text: requestBody
 
-                        echo "Waiting for AI summary (attempt ${maxTokens == 1024 ? 1 : 2}/2; timeout 5 minutes)."
+                        echo "Waiting for AI summary (attempt ${maxTokens == 4096 ? 1 : 2}/2; max tokens ${maxTokens}; timeout 5 minutes)."
                         withCredentials([string(credentialsId: 'nova-api-key', variable: 'NOVA_API_KEY')]) {
                             sh '''
                                 set -eu
@@ -151,7 +151,7 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         if (!summary.isEmpty()) {
                             break
                         }
-                        echo "AI returned no summary text on attempt ${maxTokens == 1024 ? 1 : 2}; response metadata: ${parsedResponse[1]}."
+                        echo "AI returned no summary text on attempt ${maxTokens == 4096 ? 1 : 2}; response metadata: ${parsedResponse[1]}."
                     }
 
                     if (summary.isEmpty()) {
