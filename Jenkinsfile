@@ -36,6 +36,10 @@ List parseAiResponse(String responseJson) {
 pipeline {
     agent any
 
+    tools {
+        nodejs 'Node 22'
+    }
+
     options {
         skipDefaultCheckout(true)
     }
@@ -50,7 +54,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'npm ci && npm run build'
+                sh 'node --version && npm --version && npm ci && npm run build'
             }
         }
 
