@@ -5,3 +5,4 @@ dist/
 .ai-response.json
 ai-summary.txt
 ai-test-coverage-advice.txt
+final_report.html

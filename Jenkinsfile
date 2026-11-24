@@ -33,6 +33,15 @@ List parseAiResponse(String responseJson) {
     ]
 }
 
+@NonCPS
+String escapeHtml(String text) {
+    return text.replace('&', '&amp;')
+        .replace('<', '&lt;')
+        .replace('>', '&gt;')
+        .replace('"', '&quot;')
+        .replace("'", '&#39;')
+}
+
 pipeline {
     agent any
 
@@ -274,6 +283,71 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                     } finally {
                         sh 'rm -f .ai-request.json .ai-response.json'
                     }
+                }
+
+                // Eindrapport: buildgegevens en beide AI-rapporten samenvoegen.
+                stage('Final Report') {
+                    def buildSummary = fileExists('ai-summary.txt')
+                        ? readFile(file: 'ai-summary.txt')
+                        : 'AI-buildsamenvatting niet beschikbaar.'
+                    def coverageAdvice = fileExists('ai-test-coverage-advice.txt')
+                        ? readFile(file: 'ai-test-coverage-advice.txt')
+                        : 'AI-testdekkingsadvies niet beschikbaar.'
+                    def jobName = env.JOB_NAME ?: 'Onbekende job'
+                    def buildNumber = env.BUILD_NUMBER ?: 'Onbekend'
+                    def buildResult = currentBuild.currentResult ?: 'Onbekend'
+                    def buildDuration = "${currentBuild.duration} ms"
+
+                    String report = """<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Buildrapport #${escapeHtml(buildNumber)} - ${escapeHtml(jobName)}</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #0b1110; color: #e7eee9; }
+    body { margin: 0; padding: 40px 20px; }
+    main { max-width: 900px; margin: 0 auto; }
+    header { padding: 28px; border: 1px solid #293833; border-radius: 14px; background: #121b18; }
+    .eyebrow { color: #9ab7a8; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 8px 0 20px; font-size: clamp(26px, 5vw, 40px); }
+    .meta { display: flex; flex-wrap: wrap; gap: 12px; color: #c4d2ca; }
+    .meta span { padding: 8px 12px; border: 1px solid #34463e; border-radius: 999px; }
+    section { margin-top: 20px; padding: 24px 28px; border: 1px solid #293833; border-radius: 14px; background: #121b18; }
+    h2 { margin: 0 0 16px; font-size: 20px; }
+    pre { margin: 0; color: #d7e2db; font: inherit; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+    footer { padding: 20px 4px; color: #81958a; font-size: 12px; }
+    @media (max-width: 520px) { body { padding: 18px 12px; } header, section { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="eyebrow">Jenkins | Final Report</div>
+      <h1>Buildrapport</h1>
+      <div class="meta">
+        <span>Job: ${escapeHtml(jobName)}</span>
+        <span>Build: #${escapeHtml(buildNumber)}</span>
+        <span>Resultaat: ${escapeHtml(buildResult)}</span>
+        <span>Duur: ${escapeHtml(buildDuration)}</span>
+      </div>
+    </header>
+    <section aria-labelledby="summary-title">
+      <h2 id="summary-title">AI-buildsamenvatting</h2>
+      <pre>${escapeHtml(buildSummary)}</pre>
+    </section>
+    <section aria-labelledby="coverage-title">
+      <h2 id="coverage-title">Advies over testdekking</h2>
+      <pre>${escapeHtml(coverageAdvice)}</pre>
+    </section>
+    <footer>AI-output is adviserend. Jenkins-controles bepalen de buildstatus.</footer>
+  </main>
+</body>
+</html>
+"""
+                    writeFile file: 'final_report.html', text: report
+                    archiveArtifacts artifacts: 'final_report.html'
                 }
             }
         }
