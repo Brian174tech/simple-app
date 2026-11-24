@@ -6,4 +6,4 @@ test-results/
 .ai-request.json
 .ai-response.json
 ai-summary.txt
-ai-test-coverage-advice.md
+ai-test-coverage-advice.txt
