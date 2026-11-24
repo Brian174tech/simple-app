@@ -361,13 +361,13 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
       content: "";
       pointer-events: none;
     }
-    .brandline { display: flex; align-items: center; gap: 10px; color: var(--green); font-size: 10px; letter-spacing: .1em; }
+    .brandline { display: flex; align-items: center; gap: 10px; color: var(--green); font-size: 15px; letter-spacing: .1em; }
     .brandline svg { width: 25px; height: 25px; flex: 0 0 auto; }
     .brand-muted { color: var(--muted); }
     .hero { display: grid; grid-template-columns: minmax(0, 1fr) 220px; align-items: center; gap: 32px; margin-top: 38px; }
-    .eyebrow, .metric-label, .section-kicker { color: var(--green-dim); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
-    h1 { margin: 12px 0; color: var(--text); font-size: clamp(32px, 6vw, 54px); line-height: 1; letter-spacing: -.07em; text-transform: uppercase; }
-    .hero-copy { max-width: 590px; margin: 0; color: #a6b3a8; font-size: 13px; line-height: 1.8; }
+    .eyebrow, .metric-label, .section-kicker { color: var(--green-dim); font-size: 15px; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 12px 0; color: var(--text); font-size: clamp(48px, 9vw, 81px); line-height: 1; letter-spacing: -.07em; text-transform: uppercase; }
+    .hero-copy { max-width: 590px; margin: 0; color: #a6b3a8; font-size: 19.5px; line-height: 1.8; }
     .illustration { width: 100%; max-width: 220px; justify-self: end; filter: drop-shadow(0 0 18px rgb(180 255 114 / 12%)); }
     .status-banner { display: flex; align-items: center; gap: 15px; margin-top: 30px; padding: 16px 18px; border: 1px solid var(--line); background: linear-gradient(100deg, rgb(180 255 114 / 8%), transparent 72%); }
     .status-light { width: 12px; height: 12px; flex: 0 0 auto; border-radius: 50%; background: var(--green); box-shadow: 0 0 14px currentColor; }
@@ -378,20 +378,20 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
     .status-attention .status-light, .status-attention strong { color: #ff8a72; }
     .status-attention .status-light { background: #ff8a72; }
     .status-attention { background: linear-gradient(100deg, rgb(255 138 114 / 8%), transparent 72%); }
-    .status-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
-    .status-banner strong { font-size: 13px; }
-    .status-banner p { margin: 4px 0 0; color: #a6b3a8; font-size: 11px; }
+    .status-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 13.5px; letter-spacing: .1em; text-transform: uppercase; }
+    .status-banner strong { font-size: 19.5px; }
+    .status-banner p { margin: 4px 0 0; color: #a6b3a8; font-size: 16.5px; }
     .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
     .metric { min-width: 0; padding: 16px 18px; }
-    .metric-value { display: block; margin-top: 10px; color: var(--text); font-size: 13px; overflow-wrap: anywhere; }
+    .metric-value { display: block; margin-top: 10px; color: var(--text); font-size: 19.5px; overflow-wrap: anywhere; }
     section { margin-top: 16px; padding: clamp(20px, 4vw, 30px); }
     .section-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed var(--line); }
-    .section-number { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border: 1px solid #52713a; color: var(--green); font-size: 11px; }
-    .section-kicker { margin: 0 0 5px; font-size: 9px; }
-    h2 { margin: 0; color: var(--text); font-size: clamp(17px, 3vw, 21px); font-weight: 500; letter-spacing: -.03em; }
-    .advisory { margin-left: auto; padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); font-size: 8px; letter-spacing: .07em; white-space: nowrap; text-transform: uppercase; }
-    pre { margin: 0; color: #b7c8a4; font: 12px/1.85 "Courier New", "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
-    footer { display: flex; justify-content: space-between; gap: 16px; padding: 20px 2px 6px; color: #68776c; font-size: 9px; letter-spacing: .06em; }
+    .section-number { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border: 1px solid #52713a; color: var(--green); font-size: 16.5px; }
+    .section-kicker { margin: 0 0 5px; font-size: 13.5px; }
+    h2 { margin: 0; color: var(--text); font-size: clamp(25.5px, 4.5vw, 31.5px); font-weight: 500; letter-spacing: -.03em; }
+    .advisory { margin-left: auto; padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); font-size: 12px; letter-spacing: .07em; white-space: nowrap; text-transform: uppercase; }
+    pre { margin: 0; color: #b7c8a4; font: 18px/1.85 "Courier New", "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+    footer { display: flex; justify-content: space-between; gap: 16px; padding: 20px 2px 6px; color: #68776c; font-size: 13.5px; letter-spacing: .06em; }
     @media (max-width: 620px) {
       body { padding: 16px 12px; }
       .hero { grid-template-columns: 1fr; gap: 18px; margin-top: 28px; }
@@ -403,7 +403,8 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
     }
     @media (max-width: 390px) {
       .advisory { display: none; }
-      .brandline { gap: 6px; font-size: 8px; }
+      .brandline { gap: 6px; font-size: 12px; }
+      h1 { font-size: 42px; }
     }
     @media print {
       :root { color-scheme: light; background: #fff; color: #172117; }
