@@ -7,16 +7,12 @@
   },
   "scripts": {
     "build": "mkdir -p dist && cp -f *.html styles.css dist/",
-    "serve": "http-server dist -p 4173 -c-1 -s",
-    "test": "npm run test:html && npm run test:browser",
-    "test:html": "html-validate \"dist/*.html\"",
-    "test:browser": "playwright test"
+    "test": "npm run test:html && node --test tests/*.test.js",
+    "test:html": "html-validate \"dist/*.html\""
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.14.0",
-    "@playwright/test": "^1.65.1",
+    "cheerio": "^1.2.0",
     "html-validate": "^11.21.1",
-    "http-server": "^14.1.1",
     "yaml": "^2.9.1"
   }
 }

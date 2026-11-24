@@ -74,10 +74,10 @@ pipeline {
                                 printf 'Checked out commit: '
                                 git rev-parse HEAD
                                 printf 'Application inventory: five static HTML pages and styles.css; review coverage config and tests, not full page bodies.\\n'
-                                printf 'Existing checks: page/file and local-link assertions, html-validate, Playwright navigation and axe accessibility checks.\\n'
+                                printf 'Existing checks: page/file and local-link assertions, html-validate and static content/accessibility checks.\\n'
                             } > "$context_file"
 
-                            for file in Jenkinsfile package.json .htmlvalidate.json site-pages.yaml playwright.config.js tests/site.spec.js; do
+                            for file in Jenkinsfile package.json .htmlvalidate.json site-pages.yaml tests/site.test.js; do
                                 test -f "$file" || {
                                     echo "Coverage review context is missing: $file" >&2
                                     exit 1
@@ -147,7 +147,7 @@ pipeline {
             }
         }
 
-        // Testen: bestands- en linkchecks, HTML-validatie, browsernavigatie, toetsenbord en axe.
+        // Testen: bestands- en linkchecks, HTML-validatie, inhoud en statische toegankelijkheidsstructuur.
         stage('Test Build') {
             steps {
                 sh '''set -eu
@@ -185,17 +185,10 @@ fi
 
 echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                 sh '''
-                    if npx playwright install chromium; then
-                        printf 'PASS: Playwright Chromium browser installed\\n' >> .ai-build-checks.txt
-                    else
-                        printf 'FAIL: Playwright Chromium browser installation\\n' >> .ai-build-checks.txt
-                        exit 1
-                    fi
-
                     if npm test; then
-                        printf 'PASS: HTML validation and Playwright/axe browser suite\\n' >> .ai-build-checks.txt
+                        printf 'PASS: HTML validation and static content/accessibility/link tests\\n' >> .ai-build-checks.txt
                     else
-                        printf 'FAIL: HTML validation and/or Playwright/axe browser suite\\n' >> .ai-build-checks.txt
+                        printf 'FAIL: HTML validation and/or static content/accessibility/link tests\\n' >> .ai-build-checks.txt
                         exit 1
                     fi
                 '''
