@@ -1,0 +1,50 @@
+pages:
+  - file: index.html
+    title: Secure Systems Field Guide — Home
+    h1: Build systems that hold the line.
+    description: A field guide to secure design principles for building safer systems.
+    requiredIds:
+      - main
+    requiredText:
+      - Security is a design decision.
+  - file: principles.html
+    title: Core Principles — Secure Systems Field Guide
+    h1: Core principles.
+    description: Foundational principles for designing secure systems.
+    requiredIds:
+      - main
+    requiredText:
+      - Least privilege
+      - Fail securely
+  - file: threat-modeling.html
+    title: Threat Modeling — Secure Systems Field Guide
+    h1: Ask better what-ifs.
+    description: A practical, repeatable approach to threat modeling.
+    requiredIds:
+      - main
+    requiredText:
+      - Define the system
+      - Choose defenses
+  - file: checklist.html
+    title: Launch Checklist — Secure Systems Field Guide
+    h1: Ship with confidence.
+    description: A practical secure design checklist to review before launch.
+    requiredIds:
+      - main
+    requiredText:
+      - Access & identity
+      - Data & input
+  - file: ai-jenkins.html
+    title: AI in Jenkins Pipeline — Secure Systems Field Guide
+    h1: AI in Jenkins pipeline.
+    description: Practical applications and safety guidelines for using AI in a Jenkins pipeline.
+    requiredIds:
+      - main
+      - ai-purpose-title
+      - ai-stages
+      - ai-example-title
+      - guardrails-title
+      - sources-title
+    requiredText:
+      - Advisory pipeline summary.
+      - AI advises; the pipeline decides.

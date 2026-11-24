@@ -50,7 +50,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mkdir -p dist && cp -f *.html styles.css dist/'
+                sh 'npm ci && npm run build'
             }
         }
 
@@ -67,7 +67,7 @@ pipeline {
                                 git rev-parse HEAD
                             } > "$context_file"
 
-                            for file in Jenkinsfile index.html principles.html threat-modeling.html checklist.html ai-jenkins.html styles.css; do
+                            for file in Jenkinsfile package.json .htmlvalidate.json site-pages.yaml playwright.config.js tests/site.spec.js index.html principles.html threat-modeling.html checklist.html ai-jenkins.html styles.css; do
                                 test -f "$file" || {
                                     echo "Coverage review context is missing: $file" >&2
                                     exit 1
@@ -85,7 +85,7 @@ pipeline {
                             ],
                             [
                                 role: 'user',
-                                content: "Beoordeel de testdekking van deze repositorysnapshot. De snapshot komt uit de Jenkins-checkout van de genoemde GitHub-repository en bevat de huidige Jenkinsfile en applicatiebestanden.\\n\\n${repositorySnapshot}"
+                                content: "Beoordeel de testdekking van deze repositorysnapshot. De snapshot komt uit de Jenkins-checkout van de genoemde GitHub-repository en bevat de Jenkinsfile, testconfiguratie, testsuite en applicatiebestanden.\\n\\n${repositorySnapshot}"
                             ]
                         ]
                         def coverageAdvice = ''
@@ -138,7 +138,7 @@ pipeline {
 
         stage('Test Build') {
             steps {
-                sh '''set -u
+                sh '''set -eu
 pages="index.html principles.html threat-modeling.html checklist.html ai-jenkins.html"
 report_file=".ai-build-checks.txt"
 failures=0
@@ -172,6 +172,21 @@ if [ "$failures" -gt 0 ]; then
 fi
 
 echo "Build checks passed for all 5 HTML pages and local navigation links."'''
+                sh '''
+                    if npx playwright install chromium; then
+                        printf 'PASS: Playwright Chromium browser installed\\n' >> .ai-build-checks.txt
+                    else
+                        printf 'FAIL: Playwright Chromium browser installation\\n' >> .ai-build-checks.txt
+                        exit 1
+                    fi
+
+                    if npm test; then
+                        printf 'PASS: HTML validation and Playwright/axe browser suite\\n' >> .ai-build-checks.txt
+                    else
+                        printf 'FAIL: HTML validation and/or Playwright/axe browser suite\\n' >> .ai-build-checks.txt
+                        exit 1
+                    fi
+                '''
             }
         }
 
@@ -185,71 +200,73 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
     post {
         always {
             script {
-                try {
-                    def buildContext = [
-                        job: env.JOB_NAME,
-                        number: env.BUILD_NUMBER,
-                        result: currentBuild.currentResult,
-                        durationMilliseconds: currentBuild.duration
-                    ]
-                    def checkResults = fileExists('.ai-build-checks.txt')
-                        ? readFile(file: '.ai-build-checks.txt')
-                        : 'Not available; the Test Build stage did not run or produced no results.'
-                    def messages = [
-                        [
-                            role: 'system',
-                            content: 'Schrijf een nuttig Nederlandstalig rapport van maximaal 250 woorden over de Jenkins-build. Benoem de buildstatus en doorlooptijd. Vat de uitgevoerde controles samen, noem hoeveel er slaagden en faalden, en benoem mislukte controles expliciet. Als controles niet zijn uitgevoerd of resultaten ontbreken, zeg dat duidelijk. Gebruik alleen de aangeleverde feiten, verzin geen oorzaken of resultaten en geef hooguit concrete vervolgstappen als advies. De duur is in milliseconden. AI-output bepaalt niet of de build slaagt of gepubliceerd wordt.'
-                        ],
-                        [
-                            role: 'user',
-                            content: "Pipelinegegevens: ${JsonOutput.toJson(buildContext)}\nUitgevoerde controles en resultaten:\n${checkResults}"
+                stage('AI Build Summary') {
+                    try {
+                        def buildContext = [
+                            job: env.JOB_NAME,
+                            number: env.BUILD_NUMBER,
+                            result: currentBuild.currentResult,
+                            durationMilliseconds: currentBuild.duration
                         ]
-                    ]
-                    def summary = ''
-                    for (def maxTokens in [4096, 8192]) {
-                        def requestBody = JsonOutput.toJson([
-                            model: 'qwen3.8:27b',
-                            messages: messages,
-                            max_tokens: maxTokens
-                        ])
-                        writeFile file: '.ai-request.json', text: requestBody
+                        def checkResults = fileExists('.ai-build-checks.txt')
+                            ? readFile(file: '.ai-build-checks.txt')
+                            : 'Not available; the Test Build stage did not run or produced no results.'
+                        def messages = [
+                            [
+                                role: 'system',
+                                content: 'Schrijf een nuttig Nederlandstalig rapport van maximaal 250 woorden over de Jenkins-build. Benoem de buildstatus en doorlooptijd. Vat de uitgevoerde controles samen, noem hoeveel er slaagden en faalden, en benoem mislukte controles expliciet. Als controles niet zijn uitgevoerd of resultaten ontbreken, zeg dat duidelijk. Gebruik alleen de aangeleverde feiten, verzin geen oorzaken of resultaten en geef hooguit concrete vervolgstappen als advies. De duur is in milliseconden. AI-output bepaalt niet of de build slaagt of gepubliceerd wordt.'
+                            ],
+                            [
+                                role: 'user',
+                                content: "Pipelinegegevens: ${JsonOutput.toJson(buildContext)}\nUitgevoerde controles en resultaten:\n${checkResults}"
+                            ]
+                        ]
+                        def summary = ''
+                        for (def maxTokens in [4096, 8192]) {
+                            def requestBody = JsonOutput.toJson([
+                                model: 'qwen3.8:27b',
+                                messages: messages,
+                                max_tokens: maxTokens
+                            ])
+                            writeFile file: '.ai-request.json', text: requestBody
 
-                        echo "Waiting for AI summary (attempt ${maxTokens == 4096 ? 1 : 2}/2; max tokens ${maxTokens}; timeout 5 minutes)."
-                        withCredentials([string(credentialsId: 'nova-api-key', variable: 'NOVA_API_KEY')]) {
-                            sh '''
-                                set -eu
-                                printf 'header = "Authorization: Bearer %s"\\n' "$NOVA_API_KEY" |
-                                    curl --config - --fail --silent --show-error --max-time 300 \\
-                                        --header 'Content-Type: application/json' \\
-                                        --data-binary @.ai-request.json \\
-                                        --output .ai-response.json \\
-                                        https://api.nova.datalabrotterdam.nl/v1/chat/completions
-                            '''
+                            echo "Waiting for AI summary (attempt ${maxTokens == 4096 ? 1 : 2}/2; max tokens ${maxTokens}; timeout 5 minutes)."
+                            withCredentials([string(credentialsId: 'nova-api-key', variable: 'NOVA_API_KEY')]) {
+                                sh '''
+                                    set -eu
+                                    printf 'header = "Authorization: Bearer %s"\\n' "$NOVA_API_KEY" |
+                                        curl --config - --fail --silent --show-error --max-time 300 \\
+                                            --header 'Content-Type: application/json' \\
+                                            --data-binary @.ai-request.json \\
+                                            --output .ai-response.json \\
+                                            https://api.nova.datalabrotterdam.nl/v1/chat/completions
+                                '''
+                            }
+
+                            def responseJson = readFile(file: '.ai-response.json')
+                            def parsedResponse = parseAiResponse(responseJson)
+                            summary = parsedResponse[0]
+                            if (!summary.isEmpty()) {
+                                break
+                            }
+                            echo "AI returned no summary text on attempt ${maxTokens == 4096 ? 1 : 2}; response metadata: ${parsedResponse[1]}."
                         }
 
-                        def responseJson = readFile(file: '.ai-response.json')
-                        def parsedResponse = parseAiResponse(responseJson)
-                        summary = parsedResponse[0]
-                        if (!summary.isEmpty()) {
-                            break
+                        if (summary.isEmpty()) {
+                            throw new IllegalStateException('AI service returned no summary text after retrying.')
                         }
-                        echo "AI returned no summary text on attempt ${maxTokens == 4096 ? 1 : 2}; response metadata: ${parsedResponse[1]}."
-                    }
 
-                    if (summary.isEmpty()) {
-                        throw new IllegalStateException('AI service returned no summary text after retrying.')
+                        writeFile file: 'ai-summary.txt', text: "${summary.take(5000)}\n"
+                        archiveArtifacts artifacts: 'ai-summary.txt'
+                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException interrupted) {
+                        throw interrupted
+                    } catch (org.jenkinsci.plugins.scriptsecurity.sandbox.RejectedAccessException rejected) {
+                        echo "WARNING: Jenkins Script Security blocked an operation: ${rejected.message}. Have an administrator review the signature under Manage Jenkins > In-process Script Approval."
+                    } catch (Exception err) {
+                        echo "WARNING: AI pipeline summary unavailable (${err.class.simpleName}); the Jenkins build result was not changed."
+                    } finally {
+                        sh 'rm -f .ai-request.json .ai-response.json'
                     }
-
-                    writeFile file: 'ai-summary.txt', text: "${summary.take(5000)}\n"
-                    archiveArtifacts artifacts: 'ai-summary.txt'
-                } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException interrupted) {
-                    throw interrupted
-                } catch (org.jenkinsci.plugins.scriptsecurity.sandbox.RejectedAccessException rejected) {
-                    echo "WARNING: Jenkins Script Security blocked an operation: ${rejected.message}. Have an administrator review the signature under Manage Jenkins > In-process Script Approval."
-                } catch (Exception err) {
-                    echo "WARNING: AI pipeline summary unavailable (${err.class.simpleName}); the Jenkins build result was not changed."
-                } finally {
-                    sh 'rm -f .ai-request.json .ai-response.json'
                 }
             }
         }
