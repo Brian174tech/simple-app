@@ -2,10 +2,35 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurperClassic
 
 @NonCPS
-String parseAiSummary(String responseJson) {
+List parseAiResponse(String responseJson) {
     def response = new JsonSlurperClassic().parseText(responseJson)
-    def summary = response.choices?.getAt(0)?.message?.content
-    return summary instanceof String ? summary.trim() : ''
+    def choices = response.choices
+    def choice = choices instanceof List && !choices.isEmpty() ? choices[0] : null
+    def message = choice?.message
+    def content = message?.content
+    def summary = content instanceof String
+        ? content.trim()
+        : content instanceof List
+            ? content.findAll { it instanceof Map && it.text instanceof String }
+                .collect { it.text }.join('').trim()
+            : ''
+    def messageFields = message instanceof Map
+        ? message.keySet().collect { it.toString() }.sort().join(',')
+        : 'none'
+    def responseFields = response instanceof Map
+        ? response.keySet().collect { it.toString() }.sort().join(',')
+        : 'none'
+    def finishReason = choice?.finish_reason == null
+        ? 'unknown'
+        : choice.finish_reason.toString().replaceAll(/[^A-Za-z0-9_-]/, '_').take(50)
+    def contentType = content == null ? 'null' : content.getClass().getSimpleName()
+    def contentLength = content instanceof String ? content.length() : 'n/a'
+    def choiceCount = choices instanceof List ? choices.size() : 0
+
+    return [
+        summary,
+        "choices=${choiceCount}; finish_reason=${finishReason}; message_fields=${messageFields}; response_fields=${responseFields}; content_type=${contentType}; content_length=${contentLength}"
+    ]
 }
 
 pipeline {
@@ -99,7 +124,7 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         ]
                     ]
                     def summary = ''
-                    for (def maxTokens in [512, 1024]) {
+                    for (def maxTokens in [1024, 2048]) {
                         def requestBody = JsonOutput.toJson([
                             model: 'qwen3.8:27b',
                             messages: messages,
@@ -107,7 +132,7 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         ])
                         writeFile file: '.ai-request.json', text: requestBody
 
-                        echo "Waiting for AI summary (attempt ${maxTokens == 512 ? 1 : 2}/2; timeout 5 minutes)."
+                        echo "Waiting for AI summary (attempt ${maxTokens == 1024 ? 1 : 2}/2; timeout 5 minutes)."
                         withCredentials([string(credentialsId: 'nova-api-key', variable: 'NOVA_API_KEY')]) {
                             sh '''
                                 set -eu
@@ -121,10 +146,12 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         }
 
                         def responseJson = readFile(file: '.ai-response.json')
-                        summary = parseAiSummary(responseJson)
+                        def parsedResponse = parseAiResponse(responseJson)
+                        summary = parsedResponse[0]
                         if (!summary.isEmpty()) {
                             break
                         }
+                        echo "AI returned no summary text on attempt ${maxTokens == 1024 ? 1 : 2}; response metadata: ${parsedResponse[1]}."
                     }
 
                     if (summary.isEmpty()) {
