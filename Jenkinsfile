@@ -18,6 +18,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                sh 'rm -f .ai-build-checks.txt'
                 checkout scm
             }
         }
@@ -30,32 +31,38 @@ pipeline {
 
         stage('Test Build') {
             steps {
-                sh '''set -eu
+                sh '''set -u
 pages="index.html principles.html threat-modeling.html checklist.html ai-jenkins.html"
+report_file=".ai-build-checks.txt"
+failures=0
+: > "$report_file"
 
-test -s dist/styles.css || {
-    echo "Build failed: dist/styles.css is missing or empty." >&2
-    exit 1
+record_check() {
+    check_name=$1
+    shift
+    if "$@" >/dev/null 2>&1; then
+        printf 'PASS: %s\\n' "$check_name" >> "$report_file"
+    else
+        printf 'FAIL: %s\\n' "$check_name" >> "$report_file"
+        failures=$((failures + 1))
+    fi
 }
 
-for page in $pages; do
-    test -s "dist/$page" || {
-        echo "Build failed: dist/$page is missing or empty." >&2
-        exit 1
-    }
+record_check "dist/styles.css exists and is not empty" test -s dist/styles.css
 
-    grep -F 'href="styles.css"' "dist/$page" >/dev/null || {
-        echo "Build failed: $page does not link to styles.css." >&2
-        exit 1
-    }
+for page in $pages; do
+    record_check "dist/$page exists and is not empty" test -s "dist/$page"
+    record_check "$page links to styles.css" grep -F 'href="styles.css"' "dist/$page"
 
     for target in $pages; do
-        grep -F 'href="'$target'"' "dist/$page" >/dev/null || {
-            echo "Build failed: $page does not link to $target." >&2
-            exit 1
-        }
+        record_check "$page links to $target" grep -F "href=\\"$target\\"" "dist/$page"
     done
 done
+
+if [ "$failures" -gt 0 ]; then
+    echo "Build checks failed; individual results were recorded." >&2
+    exit 1
+fi
 
 echo "Build checks passed for all 5 HTML pages and local navigation links."'''
             }
@@ -78,14 +85,17 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                         result: currentBuild.currentResult,
                         durationMilliseconds: currentBuild.duration
                     ]
+                    def checkResults = fileExists('.ai-build-checks.txt')
+                        ? readFile(file: '.ai-build-checks.txt')
+                        : 'Not available; the Test Build stage did not run or produced no results.'
                     def messages = [
                         [
                             role: 'system',
-                            content: 'Schrijf een korte Nederlandse samenvatting van de Jenkins-build. Benoem de status en doorlooptijd; de opgegeven duur is in milliseconden. Geef alleen advies; bepaal niet of de build mag slagen of publiceren.'
+                            content: 'Schrijf een nuttig Nederlandstalig rapport over de Jenkins-build. Benoem de buildstatus en doorlooptijd. Vat de uitgevoerde controles samen, noem hoeveel er slaagden en faalden, en benoem mislukte controles expliciet. Als controles niet zijn uitgevoerd of resultaten ontbreken, zeg dat duidelijk. Gebruik alleen de aangeleverde feiten, verzin geen oorzaken of resultaten en geef hooguit concrete vervolgstappen als advies. De duur is in milliseconden. AI-output bepaalt niet of de build slaagt of gepubliceerd wordt.'
                         ],
                         [
                             role: 'user',
-                            content: "Pipelinegegevens: ${JsonOutput.toJson(buildContext)}"
+                            content: "Pipelinegegevens: ${JsonOutput.toJson(buildContext)}\nUitgevoerde controles en resultaten:\n${checkResults}"
                         ]
                     ]
                     def summary = ''
