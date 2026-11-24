@@ -6,7 +6,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "mkdir -p dist && cp -f *.html styles.css dist/",
+    "build": "mkdir -p dist && rm -f dist/*.html dist/styles.css && cp -f index.html principles.html threat-modeling.html checklist.html ai-jenkins.html styles.css dist/",
     "test": "npm run test:html && node --test tests/*.test.js",
     "test:html": "html-validate \"dist/*.html\""
   },
