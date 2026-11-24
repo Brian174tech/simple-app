@@ -297,57 +297,213 @@ echo "Build checks passed for all 5 HTML pages and local navigation links."'''
                     def buildNumber = env.BUILD_NUMBER ?: 'Onbekend'
                     def buildResult = currentBuild.currentResult ?: 'Onbekend'
                     def buildDuration = "${currentBuild.duration} ms"
+                    def statusClass = buildResult == 'SUCCESS'
+                        ? 'success'
+                        : buildResult == 'UNSTABLE' ? 'warning' : 'attention'
+                    def statusMessage = buildResult == 'SUCCESS'
+                        ? 'Alle pipelinecontroles zijn geslaagd.'
+                        : buildResult == 'UNSTABLE'
+                            ? 'De build is afgerond, maar vraagt om aandacht.'
+                            : 'Bekijk de build en controles voordat je verdergaat.'
 
+                    String reportStyles = """
+    :root {
+      color-scheme: dark;
+      --bg: #050805;
+      --line: #26351d;
+      --green: #b4ff72;
+      --green-dim: #8ab84d;
+      --text: #d3e6ba;
+      --muted: #8b9b75;
+      font-family: "Courier New", "SFMono-Regular", Consolas, monospace;
+      background: var(--bg);
+      color: var(--text);
+    }
+    * { box-sizing: border-box; }
+    body {
+      position: relative;
+      min-height: 100vh;
+      margin: 0;
+      padding: 42px 20px;
+      background: radial-gradient(ellipse at 50% 0, #172016 0, #080b08 58%, #020302 100%);
+    }
+    body::before {
+      position: fixed;
+      z-index: 2;
+      top: 50%;
+      left: 50%;
+      content: "BUILD REPORT";
+      color: rgb(180 255 114 / 5%);
+      font-size: clamp(58px, 13vw, 170px);
+      font-weight: 700;
+      letter-spacing: .12em;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      transform: translate(-50%, -50%) rotate(-24deg);
+    }
+    main { position: relative; z-index: 1; width: min(100%, 980px); margin: 0 auto; }
+    .report-header, section, .metric {
+      border: 1px solid var(--line);
+      background: rgb(10 16 9 / 94%);
+      box-shadow: inset 0 0 24px rgb(0 0 0 / 22%);
+    }
+    .report-header { position: relative; overflow: hidden; padding: clamp(24px, 5vw, 42px); }
+    .report-header::after {
+      position: absolute;
+      right: -72px;
+      bottom: -132px;
+      width: 300px;
+      height: 300px;
+      border: 1px solid rgb(180 255 114 / 11%);
+      border-radius: 50%;
+      box-shadow: 0 0 0 24px rgb(180 255 114 / 2%), 0 0 0 48px rgb(180 255 114 / 2%);
+      content: "";
+      pointer-events: none;
+    }
+    .brandline { display: flex; align-items: center; gap: 10px; color: var(--green); font-size: 10px; letter-spacing: .1em; }
+    .brandline svg { width: 25px; height: 25px; flex: 0 0 auto; }
+    .brand-muted { color: var(--muted); }
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) 220px; align-items: center; gap: 32px; margin-top: 38px; }
+    .eyebrow, .metric-label, .section-kicker { color: var(--green-dim); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 12px 0; color: var(--text); font-size: clamp(32px, 6vw, 54px); line-height: 1; letter-spacing: -.07em; text-transform: uppercase; }
+    .hero-copy { max-width: 590px; margin: 0; color: #a6b3a8; font-size: 13px; line-height: 1.8; }
+    .illustration { width: 100%; max-width: 220px; justify-self: end; filter: drop-shadow(0 0 18px rgb(180 255 114 / 12%)); }
+    .status-banner { display: flex; align-items: center; gap: 15px; margin-top: 30px; padding: 16px 18px; border: 1px solid var(--line); background: linear-gradient(100deg, rgb(180 255 114 / 8%), transparent 72%); }
+    .status-light { width: 12px; height: 12px; flex: 0 0 auto; border-radius: 50%; background: var(--green); box-shadow: 0 0 14px currentColor; }
+    .status-success .status-light, .status-success strong { color: var(--green); }
+    .status-warning .status-light, .status-warning strong { color: #ffd166; }
+    .status-warning .status-light { background: #ffd166; }
+    .status-warning { background: linear-gradient(100deg, rgb(255 209 102 / 8%), transparent 72%); }
+    .status-attention .status-light, .status-attention strong { color: #ff8a72; }
+    .status-attention .status-light { background: #ff8a72; }
+    .status-attention { background: linear-gradient(100deg, rgb(255 138 114 / 8%), transparent 72%); }
+    .status-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+    .status-banner strong { font-size: 13px; }
+    .status-banner p { margin: 4px 0 0; color: #a6b3a8; font-size: 11px; }
+    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .metric { min-width: 0; padding: 16px 18px; }
+    .metric-value { display: block; margin-top: 10px; color: var(--text); font-size: 13px; overflow-wrap: anywhere; }
+    section { margin-top: 16px; padding: clamp(20px, 4vw, 30px); }
+    .section-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed var(--line); }
+    .section-number { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border: 1px solid #52713a; color: var(--green); font-size: 11px; }
+    .section-kicker { margin: 0 0 5px; font-size: 9px; }
+    h2 { margin: 0; color: var(--text); font-size: clamp(17px, 3vw, 21px); font-weight: 500; letter-spacing: -.03em; }
+    .advisory { margin-left: auto; padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); font-size: 8px; letter-spacing: .07em; white-space: nowrap; text-transform: uppercase; }
+    pre { margin: 0; color: #b7c8a4; font: 12px/1.85 "Courier New", "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+    footer { display: flex; justify-content: space-between; gap: 16px; padding: 20px 2px 6px; color: #68776c; font-size: 9px; letter-spacing: .06em; }
+    @media (max-width: 620px) {
+      body { padding: 16px 12px; }
+      .hero { grid-template-columns: 1fr; gap: 18px; margin-top: 28px; }
+      .illustration { width: 150px; justify-self: start; }
+      .metrics { grid-template-columns: 1fr; gap: 8px; }
+      .metric { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 14px; }
+      .metric-value { margin-top: 0; text-align: right; }
+      footer { flex-direction: column; gap: 6px; }
+    }
+    @media (max-width: 390px) {
+      .advisory { display: none; }
+      .brandline { gap: 6px; font-size: 8px; }
+    }
+    @media print {
+      :root { color-scheme: light; background: #fff; color: #172117; }
+      body { min-height: 0; padding: 0; background: #fff; }
+      body::before { position: fixed; color: rgb(54 105 36 / 7%); }
+      main { width: 100%; }
+      .report-header, section, .metric { color: #172117; border-color: #b7c2ae; background: #fff; box-shadow: none; break-inside: avoid; }
+      h1, h2, .metric-value, pre { color: #172117; }
+      .hero-copy, .status-banner p { color: #39483a; }
+      .status-banner { background: #f3f8ed; }
+      .metric-label, .section-kicker, .brandline, .section-number { color: #365f25; }
+      footer, .status-label { color: #52604d; }
+    }
+"""
                     String report = """<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
+  <meta name="description" content="Build- en kwaliteitsrapport voor ${escapeHtml(jobName)}, build ${escapeHtml(buildNumber)}.">
   <title>Buildrapport #${escapeHtml(buildNumber)} - ${escapeHtml(jobName)}</title>
-  <style>
-    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #0b1110; color: #e7eee9; }
-    body { margin: 0; padding: 40px 20px; }
-    main { max-width: 900px; margin: 0 auto; }
-    header { padding: 28px; border: 1px solid #293833; border-radius: 14px; background: #121b18; }
-    .eyebrow { color: #9ab7a8; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
-    h1 { margin: 8px 0 20px; font-size: clamp(26px, 5vw, 40px); }
-    .meta { display: flex; flex-wrap: wrap; gap: 12px; color: #c4d2ca; }
-    .meta span { padding: 8px 12px; border: 1px solid #34463e; border-radius: 999px; }
-    section { margin-top: 20px; padding: 24px 28px; border: 1px solid #293833; border-radius: 14px; background: #121b18; }
-    h2 { margin: 0 0 16px; font-size: 20px; }
-    pre { margin: 0; color: #d7e2db; font: inherit; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
-    footer { padding: 20px 4px; color: #81958a; font-size: 12px; }
-    @media (max-width: 520px) { body { padding: 18px 12px; } header, section { padding: 20px; } }
-  </style>
+  <link rel="stylesheet" href="final_report.css">
 </head>
 <body>
   <main>
-    <header>
-      <div class="eyebrow">Jenkins | Final Report</div>
-      <h1>Buildrapport</h1>
-      <div class="meta">
-        <span>Job: ${escapeHtml(jobName)}</span>
-        <span>Build: #${escapeHtml(buildNumber)}</span>
-        <span>Resultaat: ${escapeHtml(buildResult)}</span>
-        <span>Duur: ${escapeHtml(buildDuration)}</span>
+    <header class="report-header">
+      <div class="brandline">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 2.5 28 9.2v13.6L16 29.5 4 22.8V9.2L16 2.5Z" stroke="#52713a" stroke-width="1.5"/>
+          <path d="m10 16.2 4 4 8-8" stroke="#b4ff72" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+          <circle cx="25.5" cy="6.5" r="2" fill="#b4ff72"/>
+        </svg>
+        <span>SECURE SYSTEMS</span><span class="brand-muted">/ CI QUALITY REPORT</span>
+      </div>
+      <div class="hero">
+        <div>
+          <div class="eyebrow">BUILD #${escapeHtml(buildNumber)} / MANAGEMENT SUMMARY</div>
+          <h1>Buildrapport</h1>
+          <p class="hero-copy">Een overzicht van de buildstatus, uitgevoerde AI-analyses en aandachtspunten voor deze pipeline-uitvoering.</p>
+        </div>
+        <svg class="illustration" viewBox="0 0 220 160" fill="none" aria-hidden="true">
+          <rect x="14" y="25" width="192" height="110" rx="5" fill="#0a1009" stroke="#26351d"/>
+          <path d="M60 79h42m16 0h42" stroke="#52713a" stroke-dasharray="3 5" stroke-width="1.5"/>
+          <circle cx="49" cy="79" r="17" fill="#10190d" stroke="#52713a" stroke-width="1.5"/>
+          <path d="M44 72h10v14H44zM46 75h6M46 78h6" stroke="#b4ff72" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          <circle cx="110" cy="79" r="17" fill="#10190d" stroke="#52713a" stroke-width="1.5"/>
+          <path d="m102 79 5 5 11-11" stroke="#b4ff72" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <circle cx="171" cy="79" r="17" fill="#10190d" stroke="#52713a" stroke-width="1.5"/>
+          <path d="M171 68v4m0 14v4m11-11h-4m-14 0h-4m18-8-3 3m-10 10-3 3m16 0-3-3m-10-10-3-3" stroke="#b4ff72" stroke-linecap="round" stroke-width="1.5"/>
+          <path d="M40 114h18M101 114h18M162 114h18" stroke="#52713a" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="status-banner status-${statusClass}" role="status">
+        <span class="status-light" aria-hidden="true"></span>
+        <div>
+          <span class="status-label">Pipeline status</span>
+          <strong>${escapeHtml(buildResult)}</strong>
+          <p>${statusMessage}</p>
+        </div>
       </div>
     </header>
+    <div class="metrics" aria-label="Buildgegevens">
+      <div class="metric">
+        <span class="metric-label">Jenkins job</span>
+        <strong class="metric-value">${escapeHtml(jobName)}</strong>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Buildnummer</span>
+        <strong class="metric-value">#${escapeHtml(buildNumber)}</strong>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Doorlooptijd</span>
+        <strong class="metric-value">${escapeHtml(buildDuration)}</strong>
+      </div>
+    </div>
     <section aria-labelledby="summary-title">
-      <h2 id="summary-title">AI-buildsamenvatting</h2>
+      <div class="section-heading">
+        <span class="section-number" aria-hidden="true">01</span>
+        <div><p class="section-kicker">AI ANALYSE / BUILD</p><h2 id="summary-title">Buildsamenvatting</h2></div>
+        <span class="advisory">Adviserend</span>
+      </div>
       <pre>${escapeHtml(buildSummary)}</pre>
     </section>
     <section aria-labelledby="coverage-title">
-      <h2 id="coverage-title">Advies over testdekking</h2>
+      <div class="section-heading">
+        <span class="section-number" aria-hidden="true">02</span>
+        <div><p class="section-kicker">AI ANALYSE / TESTS</p><h2 id="coverage-title">Testdekking &amp; advies</h2></div>
+        <span class="advisory">Adviserend</span>
+      </div>
       <pre>${escapeHtml(coverageAdvice)}</pre>
     </section>
-    <footer>AI-output is adviserend. Jenkins-controles bepalen de buildstatus.</footer>
+    <footer><span>AI-output is adviserend. Jenkins-controles bepalen de buildstatus.</span><span>SECURE SYSTEMS / CI QUALITY REPORT</span></footer>
   </main>
 </body>
 </html>
 """
+                    writeFile file: 'final_report.css', text: reportStyles
                     writeFile file: 'final_report.html', text: report
-                    archiveArtifacts artifacts: 'final_report.html'
+                    archiveArtifacts artifacts: 'final_report.html,final_report.css'
                 }
             }
         }
